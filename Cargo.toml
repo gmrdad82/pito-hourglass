@@ -1,0 +1,16 @@
+[package]
+name = "pito-hourglass"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.97"
+description = "The HEY-style hourglass the pito TUIs show while data loads, with a label that shimmers in the app's accent"
+license = "MIT"
+publish = false
+
+[lib]
+name = "pito_hourglass"
+
+[dependencies]
+ratatui = { version = "0.30", default-features = false }
+unicode-segmentation = "1"
+unicode-width = "0.2"

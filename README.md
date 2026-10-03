@@ -1,1 +1,113 @@
 # pito-hourglass
+
+The hourglass the pito TUIs show while data loads: HEY's 13-frame Braille
+hourglass, its copy (the label) under it, and an optional hint under that.
+pci's TUI and License's `alf` both pin it, so the two waits look and move
+the same. It's a ratatui 0.30 widget with no backend feature, so it sits
+beside whatever crossterm the app already uses.
+
+```toml
+pito-hourglass = { git = "ssh://git@github.com/gmrdad82/pito-hourglass.git", tag = "v0.1.0" }
+```
+
+## The behaviour
+
+- **Always the hourglass plus the copy.** When the area is at least 11
+  cells wide and 6 + 1 + hint rows high (7 without a hint, 8 with one), the
+  glass, the label under it and the hint under that are centred as one
+  block.
+- **The copy always shimmers** in the app's accent: a three-character band
+  sweeps across the label and pauses. The band's centre character is the
+  accent plus bold, its two neighbours are the accent, every other
+  character is muted. The band counts the characters actually drawn, so a
+  truncated label still shimmers end to end.
+- **When the space can't fit everything,** the glass goes and the
+  shimmering label stays, centred, with the hint on the next row only when
+  there's a second row. With no room for even the label (a zero width or
+  height), nothing is drawn.
+- **The hint never shimmers;** it's always muted.
+- **Long copy is cut at a character,** never mid-glyph: widths come from
+  Unicode (a CJK glyph is two cells, a combining mark rides with its
+  letter), so Romanian diacritics, "…" and wide glyphs all cut cleanly.
+
+## The timing
+
+Both clocks run on the elapsed time alone, so a redraw at any moment lands
+on the same picture.
+
+```text
+frame_at(elapsed)   e = elapsed mod 4200 ms
+                    e <  3000: frame = floor(e * 7 / 3000)            the 7 drain frames, ~430 ms each
+                    e >= 3000: frame = 7 + floor((e - 3000) * 6 / 1200)  the 6 flip frames, 200 ms each
+
+band_at(elapsed, n) t = elapsed mod 1500 ms
+                    t <  1200: centre = floor(t * (n + 4) / 1200) - 2
+                    t >= 1200: None, the pause
+```
+
+`band_at` returns the centre's index into the `n` characters of the label,
+and `None` whenever the centre is off the label (below 0, or at `n` or
+beyond) and through the pause. The sweep starts two characters before the
+label and ends two after it, so the band slides in and out: while the
+centre sits just off either end, its neighbour on the label still lights.
+
+## The API
+
+```text
+pub const WIDTH: u16;                    // 11, every frame's width
+pub const GLASS_ROWS: u16;               // 6, every frame's height
+pub const FRAMES: [[&str; 6]; 13];       // HEY's frames, verbatim
+pub fn frame_at(elapsed: Duration) -> usize;
+pub fn band_at(elapsed: Duration, n: usize) -> Option<usize>;
+
+pub struct Hourglass<'a>;                // Widget, by value and by reference
+impl<'a> Hourglass<'a> {
+    pub fn new(elapsed: Duration) -> Self;
+    pub fn label(self, label: &'a str) -> Self;        // the copy, "Loading..." until set
+    pub fn hint(self, hint: Option<&'a str>) -> Self;  // e.g. Some("esc stops waiting")
+    pub fn glass(self, style: Style) -> Self;          // the glass, per state if the app likes
+    pub fn accent(self, style: Style) -> Self;         // the shimmer, the TUI's accent
+    pub fn muted(self, style: Style) -> Self;          // the label's base and the hint
+}
+```
+
+Each app passes its own copy and its own accent; the styles default to
+`Style::new()`. The centre of the band adds bold to the accent style it's
+given, and the neighbours use it as is.
+
+## Example
+
+```rust,standalone_crate
+use std::time::Instant;
+
+use pito_hourglass::Hourglass;
+use ratatui::{
+    Frame,
+    style::{Color, Modifier, Style},
+};
+
+fn draw(frame: &mut Frame, started: Instant) {
+    let hourglass = Hourglass::new(started.elapsed())
+        .label("Loading the estate...")
+        .hint(Some("esc stops waiting"))
+        .glass(Style::new().fg(Color::Yellow))
+        .accent(Style::new().fg(Color::Magenta))
+        .muted(Style::new().fg(Color::DarkGray).add_modifier(Modifier::DIM));
+    frame.render_widget(hourglass, frame.area());
+}
+```
+
+Redraw about every 50 ms while it shows; the picture depends only on the
+elapsed time.
+
+## Development
+
+`bin/gate` runs `cargo fmt --check`, `cargo clippy --all-targets -- -D
+warnings` and `cargo test` (the tests render through ratatui's
+`TestBackend`, and this README's example compiles as a doctest).
+
+## Licence
+
+MIT, see [LICENSE](LICENSE). The hourglass frames and their timing come
+from [basecamp/hey-cli](https://github.com/basecamp/hey-cli) under its MIT
+licence; see [NOTICE.md](NOTICE.md).
