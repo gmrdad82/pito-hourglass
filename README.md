@@ -6,7 +6,7 @@ Every pito TUI pins it, so their waits look and move the same. It's a ratatui 0.
 beside whatever crossterm the app already uses.
 
 ```toml
-pito-hourglass = { git = "https://github.com/gmrdad82/pito-hourglass", tag = "v0.1.0" }
+pito-hourglass = { git = "https://github.com/gmrdad82/pito-hourglass", tag = "v0.1.1" }
 ```
 
 ## The behaviour
