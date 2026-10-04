@@ -5,6 +5,8 @@ edition = "2024"
 rust-version = "1.97"
 description = "The HEY-style hourglass the pito TUIs show while data loads, with a label that shimmers in the app's accent"
 license = "MIT"
+authors = ["Gamer Dad"]
+repository = "https://github.com/gmrdad82/pito-hourglass"
 publish = false
 
 [lib]
