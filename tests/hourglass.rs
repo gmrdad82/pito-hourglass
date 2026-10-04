@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use pito_hourglass::{FRAMES, GLASS_ROWS, Hourglass, WIDTH, band_at, frame_at};
+use pito_hourglass::{CYCLE, FRAMES, GLASS_ROWS, Hourglass, WIDTH, band_at, frame_at};
 use ratatui::{
     Terminal,
     backend::TestBackend,
@@ -138,6 +138,33 @@ fn every_frame_shows_for_its_share_of_the_cycle() {
     }
     assert_eq!(&seen[..7], [429, 429, 428, 429, 428, 429, 428]);
     assert_eq!(&seen[7..], [200; 6]);
+}
+
+#[test]
+fn the_cycle_is_the_frames_total() {
+    let mut runs = Vec::new();
+    let mut at = 0;
+    let mut start = 0;
+    let mut frame = frame_at(ms(0));
+    loop {
+        at += 1;
+        let next = frame_at(ms(at));
+        if next != frame {
+            runs.push((frame, at - start));
+            start = at;
+            frame = next;
+            if frame == 0 {
+                break;
+            }
+        }
+    }
+    assert_eq!(runs.len(), FRAMES.len());
+    assert!(runs.iter().map(|(frame, _)| *frame).eq(0..FRAMES.len()));
+    let total: u64 = runs.iter().map(|(_, length)| length).sum();
+    assert_eq!(CYCLE, ms(total));
+    assert_eq!(CYCLE, ms(4200));
+    assert_eq!(frame_at(CYCLE), 0);
+    assert_eq!(frame_at(CYCLE - ms(1)), FRAMES.len() - 1);
 }
 
 #[test]

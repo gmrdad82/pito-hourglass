@@ -6,7 +6,7 @@ Every pito TUI pins it, so their waits look and move the same. It's a ratatui 0.
 beside whatever crossterm the app already uses.
 
 ```toml
-pito-hourglass = { git = "https://github.com/gmrdad82/pito-hourglass", tag = "v0.1.1" }
+pito-hourglass = { git = "https://github.com/gmrdad82/pito-hourglass", tag = "v0.1.2" }
 ```
 
 ## The behaviour
@@ -35,7 +35,7 @@ Both clocks run on the elapsed time alone, so a redraw at any moment lands
 on the same picture.
 
 ```text
-frame_at(elapsed)   e = elapsed mod 4200 ms
+frame_at(elapsed)   e = elapsed mod CYCLE (4200 ms)
                     e <  3000: frame = floor(e * 7 / 3000)            the 7 drain frames, ~430 ms each
                     e >= 3000: frame = 7 + floor((e - 3000) * 6 / 1200)  the 6 flip frames, 200 ms each
 
@@ -56,6 +56,7 @@ centre sits just off either end, its neighbour on the label still lights.
 pub const WIDTH: u16;                    // 11, every frame's width
 pub const GLASS_ROWS: u16;               // 6, every frame's height
 pub const FRAMES: [[&str; 6]; 13];       // HEY's frames, verbatim
+pub const CYCLE: Duration;               // one full turn, drain plus flip: 4.2 s
 pub fn frame_at(elapsed: Duration) -> usize;
 pub fn band_at(elapsed: Duration, n: usize) -> Option<usize>;
 

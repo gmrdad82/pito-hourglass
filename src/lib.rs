@@ -20,6 +20,7 @@ const DRAIN_MS: u128 = 3000;
 const FLIP_MS: u128 = 1200;
 const SWEEP_MS: u128 = 1200;
 const SHIMMER_MS: u128 = 1500;
+pub const CYCLE: Duration = Duration::from_millis((DRAIN_MS + FLIP_MS) as u64);
 
 pub const FRAMES: [[&str; 6]; 13] = [
     [
@@ -129,7 +130,7 @@ pub const FRAMES: [[&str; 6]; 13] = [
 ];
 
 pub fn frame_at(elapsed: Duration) -> usize {
-    let e = elapsed.as_millis() % (DRAIN_MS + FLIP_MS);
+    let e = elapsed.as_millis() % CYCLE.as_millis();
     let frame = if e < DRAIN_MS {
         e * DRAIN_FRAMES / DRAIN_MS
     } else {
