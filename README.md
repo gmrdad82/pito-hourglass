@@ -2,12 +2,11 @@
 
 The hourglass the pito TUIs show while data loads: HEY's 13-frame Braille
 hourglass, its copy (the label) under it, and an optional hint under that.
-pci's TUI and License's `alf` both pin it, so the two waits look and move
-the same. It's a ratatui 0.30 widget with no backend feature, so it sits
+Every pito TUI pins it, so their waits look and move the same. It's a ratatui 0.30 widget with no backend feature, so it sits
 beside whatever crossterm the app already uses.
 
 ```toml
-pito-hourglass = { git = "ssh://git@github.com/gmrdad82/pito-hourglass.git", tag = "v0.1.0" }
+pito-hourglass = { git = "https://github.com/gmrdad82/pito-hourglass", tag = "v0.1.0" }
 ```
 
 ## The behaviour
