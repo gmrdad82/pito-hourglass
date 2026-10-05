@@ -1,12 +1,12 @@
 # pito-hourglass
 
-The hourglass the pito TUIs show while data loads: HEY's 13-frame Braille
+An hourglass for ratatui apps to show while data loads: HEY's 13-frame Braille
 hourglass, its copy (the label) under it, and an optional hint under that.
-Every pito TUI pins it, so their waits look and move the same. It's a ratatui 0.30 widget with no backend feature, so it sits
-beside whatever crossterm the app already uses.
+It's a ratatui 0.30 widget with no backend feature, so it sits beside
+whatever crossterm the app already uses.
 
 ```toml
-pito-hourglass = { git = "https://github.com/gmrdad82/pito-hourglass", tag = "v0.1.2" }
+pito-hourglass = { git = "https://github.com/gmrdad82/pito-hourglass", tag = "v0.1.3" }
 ```
 
 ## The behaviour
@@ -88,7 +88,7 @@ use ratatui::{
 
 fn draw(frame: &mut Frame, started: Instant) {
     let hourglass = Hourglass::new(started.elapsed())
-        .label("Loading the estate...")
+        .label("Loading the data...")
         .hint(Some("esc stops waiting"))
         .glass(Style::new().fg(Color::Yellow))
         .accent(Style::new().fg(Color::Magenta))
@@ -104,7 +104,8 @@ elapsed time.
 
 `bin/gate` runs `cargo fmt --check`, `cargo clippy --all-targets -- -D
 warnings` and `cargo test` (the tests render through ratatui's
-`TestBackend`, and this README's example compiles as a doctest).
+`TestBackend`, a counting allocator holds that drawing allocates nothing, and
+this README's example compiles as a doctest).
 
 ## Licence
 

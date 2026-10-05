@@ -436,7 +436,7 @@ fn a_zero_area_draws_nothing() {
 
 #[test]
 fn a_long_label_is_cut_at_a_character() {
-    let long = "Waiting for the estate board";
+    let long = "Waiting for the long report";
     let drawn = whole(styled(ms(600)).label(long), 12, 1);
     assert_eq!(drawn.text, ["Waiting for"]);
     assert_eq!(drawn.marks, ["mmmmmaAammmm"]);

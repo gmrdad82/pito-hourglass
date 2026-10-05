@@ -1,9 +1,8 @@
 [package]
 name = "pito-hourglass"
-version = "0.1.2"
+version = "0.1.3"
 edition = "2024"
-rust-version = "1.97"
-description = "The HEY-style hourglass the pito TUIs show while data loads, with a label that shimmers in the app's accent"
+description = "A HEY-style hourglass for ratatui apps to show while data loads, with a label that shimmers in the app's accent"
 license = "MIT"
 authors = ["Gamer Dad"]
 repository = "https://github.com/gmrdad82/pito-hourglass"

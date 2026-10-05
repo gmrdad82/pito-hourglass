@@ -235,11 +235,13 @@ fn centred(
 ) {
     let glyphs = fitted(text, area.width);
     let n = glyphs.clone().count();
-    let used = glyphs.clone().fold(0u16, |used, (_, width)| used + width);
-    let mut x = area.x + (area.width - used) / 2;
+    let used = glyphs
+        .clone()
+        .fold(0u16, |used, (_, width)| used.saturating_add(width));
+    let mut x = area.x.saturating_add(area.width.saturating_sub(used) / 2);
     for (index, (glyph, width)) in glyphs.enumerate() {
         buf.set_stringn(x, y, glyph, usize::from(width), shade(index, n));
-        x += width;
+        x = x.saturating_add(width);
     }
 }
 
