@@ -215,24 +215,15 @@ impl<'a> Hourglass<'a> {
     }
 }
 
-fn fitted(text: &str, room: u16) -> (Vec<(&str, u16)>, u16) {
-    let mut glyphs = Vec::new();
-    let mut used: u16 = 0;
-    for glyph in text.graphemes(true) {
-        if glyph.contains(char::is_control) {
-            continue;
-        }
-        let width = u16::try_from(glyph.width()).unwrap_or(u16::MAX);
-        if width == 0 {
-            continue;
-        }
-        match used.checked_add(width) {
-            Some(next) if next <= room => used = next,
-            _ => break,
-        }
-        glyphs.push((glyph, width));
-    }
-    (glyphs, used)
+fn fitted(text: &str, room: u16) -> impl Iterator<Item = (&str, u16)> + Clone {
+    text.graphemes(true)
+        .filter(|glyph| !glyph.contains(char::is_control))
+        .map(|glyph| (glyph, u16::try_from(glyph.width()).unwrap_or(u16::MAX)))
+        .filter(|(_, width)| *width > 0)
+        .scan(0u16, move |used, (glyph, width)| {
+            *used = used.checked_add(width).filter(|next| *next <= room)?;
+            Some((glyph, width))
+        })
 }
 
 fn centred(
@@ -242,10 +233,11 @@ fn centred(
     text: &str,
     shade: impl Fn(usize, usize) -> Style,
 ) {
-    let (glyphs, used) = fitted(text, area.width);
-    let n = glyphs.len();
+    let glyphs = fitted(text, area.width);
+    let n = glyphs.clone().count();
+    let used = glyphs.clone().fold(0u16, |used, (_, width)| used + width);
     let mut x = area.x + (area.width - used) / 2;
-    for (index, (glyph, width)) in glyphs.into_iter().enumerate() {
+    for (index, (glyph, width)) in glyphs.enumerate() {
         buf.set_stringn(x, y, glyph, usize::from(width), shade(index, n));
         x += width;
     }
