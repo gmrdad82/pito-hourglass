@@ -131,12 +131,16 @@ same gate, and CI runs it on every push and pull request to main.
 Issues and pull requests are welcome. Please read the
 [code of conduct](CODE_OF_CONDUCT.md) first. A change keeps `bin/gate` green
 with no warnings, draws without allocating, keeps the picture a function of
-the elapsed time alone, and leaves every word and style to the app.
+the elapsed time alone, and leaves every word and style to the app. Report a
+security issue privately, as [SECURITY.md](SECURITY.md) says, not in a public
+issue.
 
 ## Licence
 
 The code is MIT licensed, by Catalin Ilinca: see [LICENSE](LICENSE). The
 PITO name and its logos are © Catalin Ilinca, all rights reserved, and are
-not covered by the MIT licence. The hourglass frames and their timing come
-from [basecamp/hey-cli](https://github.com/basecamp/hey-cli) under its MIT
-licence; see [NOTICE.md](NOTICE.md).
+not covered by the MIT licence; see [TRADEMARKS.md](TRADEMARKS.md). The clip
+at the top is under the MIT licence like the code
+([docs/demo.gif.license](docs/demo.gif.license)). The hourglass frames and
+their timing come from [basecamp/hey-cli](https://github.com/basecamp/hey-cli)
+under its MIT licence; see [NOTICE.md](NOTICE.md).
