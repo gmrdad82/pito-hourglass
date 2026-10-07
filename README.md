@@ -1,5 +1,7 @@
 # pito-hourglass
 
+[![CI](https://github.com/gmrdad82/pito-hourglass/actions/workflows/ci.yml/badge.svg)](https://github.com/gmrdad82/pito-hourglass/actions/workflows/ci.yml)
+
 ![The example: the hourglass drains and flips while "Loading the data..." shimmers under it, above the hint "esc stops waiting"](docs/demo.gif)
 
 An hourglass for ratatui apps to show while data loads: HEY's 13-frame Braille
@@ -7,6 +9,11 @@ hourglass, its copy (the label) under it, and an optional hint under that.
 It's a ratatui 0.30 widget with no backend feature, so it sits beside
 whatever crossterm the app already uses. It's part of
 [PITO](https://pitomd.com).
+
+## Install
+
+It isn't on crates.io; add it to the app's `[dependencies]` from this
+repository, pinned to a release tag:
 
 ```toml
 pito-hourglass = { git = "https://github.com/gmrdad82/pito-hourglass", tag = "v0.1.3" }
@@ -116,10 +123,20 @@ cargo run --example demo
 warnings`, the tests with `cargo nextest run` and the doctests with `cargo
 test --doc` (the tests render through ratatui's `TestBackend`, a counting
 allocator holds that drawing allocates nothing, and this README's example
-compiles as a doctest).
+compiles as a doctest). Nothing in it is slow, so `bin/gate --fast` is the
+same gate, and CI runs it on every push and pull request to main.
+
+## Contributing
+
+Issues and pull requests are welcome. Please read the
+[code of conduct](CODE_OF_CONDUCT.md) first. A change keeps `bin/gate` green
+with no warnings, draws without allocating, keeps the picture a function of
+the elapsed time alone, and leaves every word and style to the app.
 
 ## Licence
 
-MIT, see [LICENSE](LICENSE). The hourglass frames and their timing come
+The code is MIT licensed, by Catalin Ilinca: see [LICENSE](LICENSE). The
+PITO name and its logos are © Catalin Ilinca, all rights reserved, and are
+not covered by the MIT licence. The hourglass frames and their timing come
 from [basecamp/hey-cli](https://github.com/basecamp/hey-cli) under its MIT
 licence; see [NOTICE.md](NOTICE.md).
