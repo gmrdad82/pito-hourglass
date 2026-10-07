@@ -1,9 +1,12 @@
 # pito-hourglass
 
+![The example: the hourglass drains and flips while "Loading the data..." shimmers under it, above the hint "esc stops waiting"](docs/demo.gif)
+
 An hourglass for ratatui apps to show while data loads: HEY's 13-frame Braille
 hourglass, its copy (the label) under it, and an optional hint under that.
 It's a ratatui 0.30 widget with no backend feature, so it sits beside
-whatever crossterm the app already uses.
+whatever crossterm the app already uses. It's part of
+[PITO](https://pitomd.com).
 
 ```toml
 pito-hourglass = { git = "https://github.com/gmrdad82/pito-hourglass", tag = "v0.1.3" }
@@ -100,12 +103,20 @@ fn draw(frame: &mut Frame, started: Instant) {
 Redraw about every 50 ms while it shows; the picture depends only on the
 elapsed time.
 
+The same code runs in a terminal as [examples/demo.rs](examples/demo.rs), the
+clip at the top of this page; Esc or q quits:
+
+```sh
+cargo run --example demo
+```
+
 ## Development
 
 `bin/gate` runs `cargo fmt --check`, `cargo clippy --all-targets -- -D
-warnings` and `cargo test` (the tests render through ratatui's
-`TestBackend`, a counting allocator holds that drawing allocates nothing, and
-this README's example compiles as a doctest).
+warnings`, the tests with `cargo nextest run` and the doctests with `cargo
+test --doc` (the tests render through ratatui's `TestBackend`, a counting
+allocator holds that drawing allocates nothing, and this README's example
+compiles as a doctest).
 
 ## Licence
 
