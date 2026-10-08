@@ -1,8 +1,9 @@
+<p align="center"><img src="docs/demo.gif" alt="The example: the hourglass drains and flips while &quot;Loading the data...&quot; shimmers under it, above the hint &quot;esc stops waiting&quot;"></p>
+
 # pito-hourglass
 
 [![CI](https://github.com/gmrdad82/pito-hourglass/actions/workflows/ci.yml/badge.svg)](https://github.com/gmrdad82/pito-hourglass/actions/workflows/ci.yml)
-
-![The example: the hourglass drains and flips while "Loading the data..." shimmers under it, above the hint "esc stops waiting"](docs/demo.gif)
+[![Version](https://img.shields.io/github/v/tag/gmrdad82/pito-hourglass)](https://github.com/gmrdad82/pito-hourglass/tags)
 
 An hourglass for ratatui apps to show while data loads: HEY's 13-frame Braille
 hourglass, its copy (the label) under it, and an optional hint under that.
