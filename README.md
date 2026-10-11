@@ -11,6 +11,8 @@ It's a ratatui 0.30 widget with no backend feature, so it sits beside
 whatever crossterm the app already uses. It's part of
 [PITO](https://pitomd.com).
 
+Works on Linux, Windows and macOS (CI-tested on all three).
+
 ## Install
 
 It isn't on crates.io; add it to the app's `[dependencies]` from this
