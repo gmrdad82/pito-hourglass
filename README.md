@@ -125,7 +125,8 @@ warnings`, the tests with `cargo nextest run` and the doctests with `cargo
 test --doc` (the tests render through ratatui's `TestBackend`, a counting
 allocator holds that drawing allocates nothing, and this README's example
 compiles as a doctest). Nothing in it is slow, so `bin/gate --fast` is the
-same gate, and CI runs it on every push and pull request to main.
+same gate. CI runs it, then a release build, on Linux, Windows and macOS for
+every push and pull request, and nightly on main.
 
 ## Contributing
 
