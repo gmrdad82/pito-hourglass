@@ -9,7 +9,7 @@ An hourglass for ratatui apps to show while data loads: HEY's 13-frame Braille
 hourglass, its copy (the label) under it, and an optional hint under that.
 It's a ratatui 0.30 widget with no backend feature, so it sits beside
 whatever crossterm the app already uses. It's part of
-[PITO](https://pitomd.com).
+[PITO MD](https://pitomd.com).
 
 Works on Linux, Windows and macOS (CI-tested on all three).
 
@@ -142,7 +142,7 @@ issue.
 ## Licence
 
 The code is MIT licensed, by Catalin Ilinca: see [LICENSE](LICENSE). The
-PITO name and its logos are © Catalin Ilinca, all rights reserved, and are
+PITO MD name and its logos are © Catalin Ilinca, all rights reserved, and are
 not covered by the MIT licence; see [TRADEMARKS.md](TRADEMARKS.md). The clip
 at the top is under the MIT licence like the code
 ([docs/demo.gif.license](docs/demo.gif.license)). The hourglass frames and
