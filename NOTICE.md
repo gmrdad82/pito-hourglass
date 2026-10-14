@@ -29,3 +29,18 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
+
+# README images
+
+The images in `docs/images/` are this crate's own, under its MIT licence
+like the code (© 2026 Cătălin Ilinca); the names and logos in them are
+covered by TRADEMARKS.md, not by that licence. Each comes from the crate
+itself:
+
+- `demo.gif`: `examples/demo.rs`, recorded with prec (`render/terminal.toml`,
+  shot `demo`) and made a GIF with pconv.
+- `gallery.gif`: `examples/gallery.rs`, shot `gallery`, the same way.
+- `fit.gif`: `examples/fit.rs`, shot `fit`, the same way.
+- `frames.png`: `examples/frames.rs`, a prec still (shot `frames`).
+- `draw-time.png`: drawn by pito-compare's `pcmp` from `draw-time.toml`,
+  which `examples/bench.rs` printed on 2026-10-14.

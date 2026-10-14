@@ -4,7 +4,7 @@ grid = [30, 10]
 frame = "bare"
 
 [build]
-command = "cargo build --release --locked --example demo"
+command = "cargo build --release --locked --examples"
 bin_dir = "{target}/release/examples"
 
 [theme]
@@ -35,4 +35,25 @@ kind = "clip"
 line = "The README's example: the glass drains and flips while its label shimmers"
 tape = "render/terminal/demo.tape"
 launch = "demo"
+settle = "1500ms"
+
+[shots.gallery]
+kind = "clip"
+line = "Four apps' hourglasses, each with its own copy, script and accent"
+tape = "render/terminal/gallery.tape"
+launch = "gallery"
+settle = "1500ms"
+
+[shots.fit]
+kind = "clip"
+line = "One hourglass as its area shrinks: the glass goes first, then the hint, then the label is cut"
+tape = "render/terminal/fit.tape"
+launch = "fit"
+settle = "1500ms"
+
+[shots.frames]
+kind = "still"
+line = "The 13 frames and the time each one starts"
+tape = "render/terminal/frames.tape"
+launch = "frames"
 settle = "1500ms"
