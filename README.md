@@ -197,6 +197,11 @@ every push and pull request, and nightly on main.
 The clips and the still are the examples recorded with prec from
 `render/terminal.toml`.
 
+`bin/docs-bundle` builds `docs-vX.Y.Z.tar.gz`, this crate's section of
+[docs.pitomd.com](https://docs.pitomd.com/pito-hourglass/): the guides in
+`docs/site/`, the `cargo doc` API reference, the changelog and the images.
+The release workflow attaches it to every tag's GitHub Release.
+
 ## Contributing
 
 Issues and pull requests are welcome. Please read the

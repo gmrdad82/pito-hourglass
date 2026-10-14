@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+usage() {
+    echo "Usage: bin/docs-bundle [--out <dir>] [vX.Y.Z]" >&2
+    exit 2
+}
+
+out=tmp
+tag=
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --out) [ $# -ge 2 ] || usage; out=$2; shift 2 ;;
+        -h | --help) echo "Usage: bin/docs-bundle [--out <dir>] [vX.Y.Z]"; exit 0 ;;
+        v*) [ -z "$tag" ] || usage; tag=$1; shift ;;
+        *) usage ;;
+    esac
+done
+
+version=$(sed -n 's/^version = "\(.*\)"$/\1/p' Cargo.toml | head -1)
+tag=${tag:-v$version}
+[ "$tag" = "v$version" ] || { echo "docs-bundle: $tag is not the crate's version, v$version" >&2; exit 1; }
+
+repo=https://github.com/gmrdad82/pito-hourglass
+stage=tmp/docs-bundle
+rm -rf "$stage"
+docs=$stage/docs
+mkdir -p "$docs/images"
+
+cp -R docs/site/. "$docs/"
+find "$docs" -name '*.md' -exec sed -i "s/@TAG@/$tag/g" {} +
+
+for image in docs/images/*.png docs/images/*.gif docs/images/*.webp; do
+    [ -e "$image" ] || continue
+    name=$(basename "$image")
+    grep -q "\`$name\`" NOTICE.md || { echo "docs-bundle: $name is not named in NOTICE.md" >&2; exit 1; }
+    cp "$image" "$docs/images/"
+done
+
+{
+    printf -- '---\ntitle: Changelog\ndescription: Every pito-hourglass release and what changed in it.\nsidebar:\n  order: 90\n---\n'
+    sed '1{/^# /d;}' CHANGELOG.md
+} > "$docs/changelog.md"
+
+cargo doc --no-deps --locked
+cp -R target/doc "$docs/api"
+rm -f "$docs/api/.lock"
+sed -i \
+    -e 's#src="docs/images/#src="../../images/#g' \
+    -e "s#href=\"\\(examples/[^\"]*\\|docs/images/[^\"]*\\|LICENSE\\|NOTICE\\.md\\|TRADEMARKS\\.md\\|SECURITY\\.md\\|CODE_OF_CONDUCT\\.md\\)\"#href=\"$repo/blob/$tag/\\1\"#g" \
+    "$docs/api/pito_hourglass/index.html"
+printf '<!doctype html>\n<meta charset="utf-8">\n<meta http-equiv="refresh" content="0; url=pito_hourglass/index.html">\n<title>pito_hourglass</title>\n<a href="pito_hourglass/index.html">pito_hourglass</a>\n' > "$docs/api/index.html"
+
+for page in $(find "$docs" -path "$docs/api" -prune -o -name "*.md" -print | sort); do
+    head -1 "$page" | grep -qx -- '---' || { echo "docs-bundle: ${page#"$stage"/} has no frontmatter" >&2; exit 1; }
+    dir=$(dirname "$page")
+    for link in $(grep -o '](\([^)#:]*\))' "$page" | sed 's/^](\(.*\))$/\1/'); do
+        [ -e "$dir/$link" ] || { echo "docs-bundle: ${page#"$stage"/} links to $link, which isn't in the bundle" >&2; exit 1; }
+    done
+done
+
+mkdir -p "$out"
+archive=$out/docs-$tag.tar.gz
+epoch=$(git log -1 --format=%ct 2>/dev/null || date +%s)
+tar --sort=name --owner=0 --group=0 --numeric-owner --mtime="@$epoch" -C "$stage" -cf - docs | gzip -n > "$archive"
+echo "$archive"
