@@ -1,5 +1,18 @@
 # Changelog
 
+## v1.0.0 — 2026-10-14
+
+### Added
+
+- The README shows every feature with a picture and leads with measured numbers: 4.8 µs a draw, zero allocations, and no new crates for a ratatui app.
+- Examples to run and read: `demo` (the clip at the top of the README), `gallery` (four apps' copy and accents), `fit` (what it draws as the area shrinks), `frames` (the 13 frames and when each starts) and `bench` (the draw time per area).
+
+### Changed
+
+- The crate is 1.0.0, with the same API and the same picture as 0.1.3.
+- CI tests every change on Linux, Windows and macOS.
+- LICENSE is the MIT text alone, under Cătălin Ilinca's name, and TRADEMARKS.md keeps the PITO MD name and logos.
+
 ## v0.1.3 — 2026-10-05
 
 ### Changed
