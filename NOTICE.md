@@ -45,10 +45,10 @@ itself:
 - `draw-time.png`: drawn by pito-compare's `pcmp` from `draw-time.toml`,
   which `examples/bench.rs` printed on 2026-10-14.
 
-# The PITO MD mark
+# The PITO MD wordmark
 
-`assets/marks/pitomd.svg`, shown at the README's Licence section, is copied
-by `bin/marks` from the PITO MD brand masters at
-fe97f221c8c071389283144c416f4fcde87b3958 (`exports/pitomd/render/marks/logos/pitomd.svg`).
+`assets/marks/pitomd-wordmark.svg`, shown at the README's Licence section, is
+copied by `bin/marks` from the PITO MD brand masters at
+aa3aee8b232a1b848995bf3d9a012a01d4aff8ec (`exports/pitomd/readme/wordmark.svg`).
 The PITO MD name and its logos are © Cătălin Ilinca, all rights reserved and
 not covered by the MIT licence (TRADEMARKS.md).

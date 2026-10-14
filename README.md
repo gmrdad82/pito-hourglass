@@ -213,7 +213,7 @@ issue.
 
 ## Licence
 
-<img src="assets/marks/pitomd.svg" width="128" alt="The PITO MD mark">
+<img src="assets/marks/pitomd-wordmark.svg" width="320" alt="PITO MD">
 
 The code is MIT licensed, by Catalin Ilinca: see [LICENSE](LICENSE). The
 PITO MD name and its logos are © Catalin Ilinca, all rights reserved, and are
