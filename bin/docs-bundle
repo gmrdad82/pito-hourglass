@@ -43,6 +43,19 @@ done
     sed '1{/^# /d;}' CHANGELOG.md
 } > "$docs/changelog.md"
 
+find "$docs" -name '*.md' -exec perl -0pi -e '
+    s{\A(---\n.*?\n---\n)}{
+        my $front = $1;
+        $front =~ s{^(title|description|  label): *(.*?) *$}{
+            my ($key, $value) = ($1, $2);
+            $value = $1 =~ s/\\"/"/gr =~ s/\\\\/\\/gr if $value =~ /\A"(.*)"\z/;
+            $value =~ s/\\/\\\\/g;
+            $value =~ s/"/\\"/g;
+            "$key: \"$value\""
+        }gme;
+        $front
+    }se' {} +
+
 cargo doc --no-deps --locked
 cp -R target/doc "$docs/api"
 rm -f "$docs/api/.lock"
