@@ -37,6 +37,7 @@ for image in docs/images/*.png docs/images/*.gif docs/images/*.webp; do
     grep -q "\`$name\`" NOTICE.md || { echo "docs-bundle: $name is not named in NOTICE.md" >&2; exit 1; }
     cp "$image" "$docs/images/"
 done
+cp assets/marks/*.svg "$docs/images/"
 
 {
     printf -- '---\ntitle: Changelog\ndescription: Every pito-hourglass release and what changed in it.\nsidebar:\n  order: 90\n---\n'
@@ -61,6 +62,7 @@ cp -R target/doc "$docs/api"
 rm -f "$docs/api/.lock"
 sed -i \
     -e 's#src="docs/images/#src="../../images/#g' \
+    -e 's#src="assets/marks/#src="../../images/#g' \
     -e "s#href=\"\\(examples/[^\"]*\\|docs/images/[^\"]*\\|LICENSE\\|NOTICE\\.md\\|TRADEMARKS\\.md\\|SECURITY\\.md\\|CODE_OF_CONDUCT\\.md\\)\"#href=\"$repo/blob/$tag/\\1\"#g" \
     "$docs/api/pito_hourglass/index.html"
 printf '<!doctype html>\n<meta charset="utf-8">\n<meta http-equiv="refresh" content="0; url=pito_hourglass/index.html">\n<title>pito_hourglass</title>\n<a href="pito_hourglass/index.html">pito_hourglass</a>\n' > "$docs/api/index.html"

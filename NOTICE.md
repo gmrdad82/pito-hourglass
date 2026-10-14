@@ -44,3 +44,11 @@ itself:
 - `frames.png`: `examples/frames.rs`, a prec still (shot `frames`).
 - `draw-time.png`: drawn by pito-compare's `pcmp` from `draw-time.toml`,
   which `examples/bench.rs` printed on 2026-10-14.
+
+# The PITO MD mark
+
+`assets/marks/pitomd.svg`, shown at the README's Licence section, is copied
+by `bin/marks` from the PITO MD brand masters at
+fe97f221c8c071389283144c416f4fcde87b3958 (`exports/pitomd/render/marks/logos/pitomd.svg`).
+The PITO MD name and its logos are © Cătălin Ilinca, all rights reserved and
+not covered by the MIT licence (TRADEMARKS.md).
