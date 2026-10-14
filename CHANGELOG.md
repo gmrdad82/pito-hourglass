@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.0.1 — 2026-10-14
+
+### Added
+
+- Documentation for docs.pitomd.com: an overview, install for Linux, Windows and macOS, five guides with runnable code, the API reference and the changelog, attached to every release as docs-vX.Y.Z.tar.gz.
+
+### Changed
+
+- The README pins v1.0.1. The API and the picture are the same as 1.0.0.
+
 ## v1.0.0 — 2026-10-14
 
 ### Added
