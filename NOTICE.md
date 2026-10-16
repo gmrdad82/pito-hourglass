@@ -38,7 +38,8 @@ covered by TRADEMARKS.md, not by that licence. Each comes from the crate
 itself:
 
 - `demo.gif`: `examples/demo.rs`, recorded with prec (`render/terminal.toml`,
-  shot `demo`) and made a GIF with pconv.
+  shot `demo`) and made a GIF with pcod
+  ([pito-codecs](https://github.com/gmrdad82/pito-codecs)).
 - `gallery.gif`: `examples/gallery.rs`, shot `gallery`, the same way.
 - `fit.gif`: `examples/fit.rs`, shot `fit`, the same way.
 - `frames.png`: `examples/frames.rs`, a prec still (shot `frames`).

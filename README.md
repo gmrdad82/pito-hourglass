@@ -181,7 +181,7 @@ terminal apps, brings it in beside
 [pito-footer](https://github.com/gmrdad82/pito-footer) and
 [pito-list](https://github.com/gmrdad82/pito-list). The clips on this page
 are recorded with [prec](https://github.com/gmrdad82/prec) and made GIFs with
-[pconv](https://github.com/gmrdad82/pconv), and the chart is drawn by
+[pcod](https://github.com/gmrdad82/pito-codecs), and the chart is drawn by
 [pito-compare](https://github.com/gmrdad82/pito-compare).
 
 ## Development
