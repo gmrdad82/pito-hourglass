@@ -2,7 +2,6 @@
 
 # pito-hourglass
 
-[![CI](https://github.com/gmrdad82/pito-hourglass/actions/workflows/ci.yml/badge.svg)](https://github.com/gmrdad82/pito-hourglass/actions/workflows/ci.yml)
 [![Version](https://img.shields.io/github/v/tag/gmrdad82/pito-hourglass)](https://github.com/gmrdad82/pito-hourglass/tags)
 
 An hourglass for ratatui apps to show while data loads: HEY's 13-frame Braille
@@ -12,8 +11,8 @@ and an optional hint under that. One widget, one call a frame. It's part of
 
 - **4.8 µs a draw** with the glass, the label and the hint, under 0.03% of a
   60 fps frame; 1.0 µs on a single row ([how it's measured](#fast-and-allocation-free)).
-- **Zero allocations** when it draws, held by a counting-allocator test on
-  every CI run.
+- **Zero allocations** when it draws, held by a counting-allocator test in
+  the gate.
 - **No new crates for a ratatui app:** its three dependencies (ratatui 0.30
   with no default features, unicode-segmentation and unicode-width) are all
   already in ratatui's own graph, and it brings no backend, so it sits beside
@@ -21,7 +20,7 @@ and an optional hint under that. One widget, one call a frame. It's part of
 - **Small:** one 285-line source file, a 96-byte `Copy` widget, and the crate
   builds in 1.4 s (release, once its dependencies are built).
 
-Works on Linux, Windows and macOS (CI-tested on all three).
+Works on Linux, Windows and macOS.
 
 ## Install and first use
 
@@ -191,8 +190,7 @@ warnings`, the tests with `cargo nextest run` and the doctests with `cargo
 test --doc` (the tests render through ratatui's `TestBackend`, a counting
 allocator holds that drawing allocates nothing, and this README's example
 compiles as a doctest). Nothing in it is slow, so `bin/gate --fast` is the
-same gate. CI runs it, then a release build, on Linux, Windows and macOS for
-every push and pull request, and nightly on main.
+same gate. It runs before every merge to main and on every tag.
 
 The clips and the still are the examples recorded with prec from
 `render/terminal.toml`.
@@ -200,7 +198,7 @@ The clips and the still are the examples recorded with prec from
 `bin/docs-bundle` builds `docs-vX.Y.Z.tar.gz`, this crate's section of
 [docs.pitomd.com](https://docs.pitomd.com/pito-hourglass/): the guides in
 `docs/site/`, the `cargo doc` API reference, the changelog and the images.
-The release workflow attaches it to every tag's GitHub Release.
+Every tag's GitHub Release carries it.
 
 ## Contributing
 

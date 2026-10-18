@@ -60,8 +60,7 @@ pcmp draw-time.toml --out .
 
 Drawing allocates nothing. `tests/allocation.rs` counts every allocation
 through a global allocator while 200 frames are drawn at six sizes, and holds
-the count at zero; it runs on Linux, Windows and macOS on every CI run. From a
-clone:
+the count at zero; it runs in the gate. From a clone:
 
 ```sh
 cargo test --test allocation

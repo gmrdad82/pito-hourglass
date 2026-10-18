@@ -14,15 +14,15 @@ and an optional hint under that. One widget, one call a frame. It's part of
 
 - **4.8 µs a draw** with the glass, the label and the hint, under 0.03% of a
   60 fps frame; 1.0 µs on a single row ([how it's measured](guides/performance.md)).
-- **Zero allocations** when it draws, held by a counting-allocator test on
-  every CI run.
+- **Zero allocations** when it draws, held by a counting-allocator test in
+  the gate.
 - **No new crates for a ratatui app:** its three dependencies (ratatui 0.30
   with no default features, unicode-segmentation and unicode-width) are all
   already in ratatui's own graph, and it brings no backend, so it sits beside
   whatever crossterm the app uses.
 - **Small:** one 285-line source file and a 96-byte `Copy` widget.
 
-Works on Linux, Windows and macOS (CI-tested on all three).
+Works on Linux, Windows and macOS.
 
 ## Where to go
 
