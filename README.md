@@ -22,6 +22,8 @@ and an optional hint under that. One widget, one call a frame. It's part of
 
 Works on Linux, Windows and macOS.
 
+Got questions or doubts? Ping me on Discord: https://discord.gg/XsNcn3kYzn
+
 ## Install and first use
 
 It isn't on crates.io; add it from this repository, pinned to a release tag.
