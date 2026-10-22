@@ -30,13 +30,13 @@ It isn't on crates.io; add it from this repository, pinned to a release tag.
 The same line works on Linux, Windows and macOS:
 
 ```sh
-cargo add pito-hourglass --git https://github.com/gmrdad82/pito-hourglass --tag v1.0.1
+cargo add pito-hourglass --git https://github.com/gmrdad82/pito-hourglass --tag v1.0.2
 ```
 
 or by hand in `Cargo.toml`:
 
 ```toml
-pito-hourglass = { git = "https://github.com/gmrdad82/pito-hourglass", tag = "v1.0.1" }
+pito-hourglass = { git = "https://github.com/gmrdad82/pito-hourglass", tag = "v1.0.2" }
 ```
 
 Then draw it from the time the wait started:
