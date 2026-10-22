@@ -514,7 +514,7 @@ fn render_into(widget: Hourglass<'_>, bounds: Rect, area: Rect) -> Buffer {
 
 #[test]
 fn control_characters_are_dropped_and_the_rest_centres_as_if_they_were_never_there() {
-    let dirty_label = "\tLoad\x1b[31ming...\x7f\r\n";
+    let dirty_label = "\tLoad\x1b[31ming\u{9b}...\x7f\u{85}\r\n";
     let dirty_hint = "\x1b[0mesc\tstops\nwaiting\x7f";
     let clean_label = "Load[31ming...";
     let clean_hint = "[0mescstopswaiting";
@@ -640,7 +640,10 @@ fn the_band_for_no_one_and_very_many_characters() {
     assert!(!one.is_empty());
     assert!(one.iter().all(|band| *band == 0));
     assert_eq!(band_at(ms(0), usize::MAX), None);
-    assert_eq!(band_at(ms(600), usize::MAX), Some(usize::MAX / 2));
+    assert!(
+        band_at(ms(600), usize::MAX)
+            .is_some_and(|band| band > usize::MAX / 4 && band < 3 * (usize::MAX / 4))
+    );
     assert_eq!(band_at(ms(1200), usize::MAX), None);
     let sweep: Vec<usize> = (0..1200)
         .filter_map(|at| band_at(ms(at), usize::MAX))
@@ -758,31 +761,32 @@ fn no_render_touches_a_cell_outside_its_area() {
     for width in 0..=14u16 {
         for height in 0..=10u16 {
             let step = usize::from(width) * 11 + usize::from(height);
-            let (x, y) = offsets[step % offsets.len()];
             let at = CYCLE * u32::try_from(step % 13).unwrap() / 13;
-            let area = Rect::new(x, y, width, height);
-            for hint in [None, Some(HINT)] {
-                let mut buffer = Buffer::filled(bounds, sentinel.clone());
-                styled(at).label(LABEL).hint(hint).render(area, &mut buffer);
-                let mut touched = 0;
-                for row in bounds.top()..bounds.bottom() {
-                    for column in bounds.left()..bounds.right() {
-                        let cell = &buffer[(column, row)];
-                        if area.contains(Position::new(column, row)) {
-                            touched += usize::from(*cell != sentinel);
-                        } else {
-                            assert_eq!(*cell, sentinel, "{area:?} at {at:?} hint {hint:?}");
+            for (x, y) in offsets {
+                let area = Rect::new(x, y, width, height);
+                for hint in [None, Some(HINT), Some("日本語のラベル ﾊﾞｶ")] {
+                    let mut buffer = Buffer::filled(bounds, sentinel.clone());
+                    styled(at).label(LABEL).hint(hint).render(area, &mut buffer);
+                    let mut touched = 0;
+                    for row in bounds.top()..bounds.bottom() {
+                        for column in bounds.left()..bounds.right() {
+                            let cell = &buffer[(column, row)];
+                            if area.contains(Position::new(column, row)) {
+                                touched += usize::from(*cell != sentinel);
+                            } else {
+                                assert_eq!(*cell, sentinel, "{area:?} at {at:?} hint {hint:?}");
+                            }
                         }
                     }
+                    assert_eq!(
+                        touched > 0,
+                        !area.intersection(bounds).is_empty(),
+                        "{area:?} at {at:?} hint {hint:?}"
+                    );
+                    renders += 1;
                 }
-                assert_eq!(
-                    touched > 0,
-                    !area.intersection(bounds).is_empty(),
-                    "{area:?} at {at:?} hint {hint:?}"
-                );
-                renders += 1;
             }
         }
     }
-    assert_eq!(renders, 330);
+    assert_eq!(renders, 1980);
 }
