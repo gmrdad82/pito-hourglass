@@ -1,6 +1,6 @@
 [package]
 name = "pito-hourglass"
-version = "1.0.1"
+version = "1.0.2"
 edition = "2024"
 description = "A HEY-style hourglass for ratatui apps to show while data loads, with a label that shimmers in the app's accent"
 license = "MIT"

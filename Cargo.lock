@@ -432,7 +432,7 @@ dependencies = [
 
 [[package]]
 name = "pito-hourglass"
-version = "1.0.1"
+version = "1.0.2"
 dependencies = [
  "ratatui",
  "unicode-segmentation",

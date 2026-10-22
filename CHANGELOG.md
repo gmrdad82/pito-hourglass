@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.0.2 — 2026-10-23
+
+### Fixed
+
+- Labels and hints with halfwidth katakana sound marks (ﾞ ﾟ) now draw in full and centre correctly; glyph widths are measured the way ratatui draws them.
+
+### Changed
+
+- Needs ratatui 0.30.1 or later, and depends on one crate fewer (unicode-width is gone).
+- The README shows the PITO MD wordmark under its Licence heading and a line to ask questions on Discord.
+
 ## v1.0.1 — 2026-10-14
 
 ### Added
