@@ -755,16 +755,28 @@ fn a_buffer_at_the_u16_limit_draws_like_one_at_the_origin() {
         }
         for (width, height) in [(21, 7), (21, 8), (11, 7), (10, 2), (10, 1), (21, 1)] {
             let area = Rect::new(u16::MAX - width, u16::MAX - height, width, height);
-            let limit = read(&render_into(hourglass(ms(at)), bounds, area));
-            let mut origin = Buffer::empty(Rect::new(0, 0, 21, 10));
-            hourglass(ms(at)).render(
-                Rect::new(21 - width, 10 - height, width, height),
-                &mut origin,
-            );
-            let origin = read(&origin);
-            assert_eq!(limit.text, origin.text, "at {at} ms in {width}x{height}");
-            assert_eq!(limit.marks, origin.marks, "at {at} ms in {width}x{height}");
-            assert!(!limit.blank(), "at {at} ms in {width}x{height}");
+            for (widget, block) in [(hourglass(ms(at)), 8), (styled(ms(at)).label(LABEL), 7)] {
+                let limit = read(&render_into(widget, bounds, area));
+                let mut origin = Buffer::empty(Rect::new(0, 0, 21, 10));
+                widget.render(
+                    Rect::new(21 - width, 10 - height, width, height),
+                    &mut origin,
+                );
+                let origin = read(&origin);
+                let case = format!("at {at} ms in {width}x{height}, block {block}");
+                assert_eq!(limit.text, origin.text, "{case}");
+                assert_eq!(limit.marks, origin.marks, "{case}");
+                assert!(!limit.blank(), "{case}");
+                let glass = width >= 11 && height >= block;
+                assert_eq!(
+                    limit.marks.iter().any(|row| row.contains('g')),
+                    glass,
+                    "{case}"
+                );
+                if glass && height == 7 {
+                    assert_eq!(limit.text[9].trim(), LABEL, "{case}");
+                }
+            }
         }
     }
 }

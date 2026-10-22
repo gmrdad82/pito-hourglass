@@ -5,7 +5,7 @@ sidebar:
   order: 2
 ---
 
-pito-hourglass is a Rust library for [ratatui](https://ratatui.rs) 0.30 apps.
+pito-hourglass is a Rust library for [ratatui](https://ratatui.rs) 0.30 apps (0.30.1 or later).
 It isn't on crates.io; add it from its repository, pinned to a release tag.
 
 ## Linux, Windows and macOS
@@ -26,12 +26,12 @@ or by hand in `Cargo.toml`:
 ```toml
 [dependencies]
 pito-hourglass = { git = "https://github.com/gmrdad82/pito-hourglass", tag = "@TAG@" }
-ratatui = "0.30"
+ratatui = "0.30.1"
 ```
 
-It needs nothing else: no backend, no build script, no system library. Its
-dependencies (ratatui with no default features, unicode-segmentation and
-unicode-width) are already in a ratatui app's graph.
+It needs nothing else: no backend, no build script, no system library. Its two
+dependencies (ratatui 0.30.1 or later with no default features, and
+unicode-segmentation) are already in a ratatui app's graph.
 
 ## Quick start
 

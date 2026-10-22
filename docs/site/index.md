@@ -16,11 +16,11 @@ and an optional hint under that. One widget, one call a frame. It's part of
   60 fps frame; 1.0 µs on a single row ([how it's measured](guides/performance.md)).
 - **Zero allocations** when it draws, held by a counting-allocator test in
   the gate.
-- **No new crates for a ratatui app:** its three dependencies (ratatui 0.30
-  with no default features, unicode-segmentation and unicode-width) are all
+- **No new crates for a ratatui app:** its two dependencies (ratatui 0.30.1
+  with no default features, and unicode-segmentation) are all
   already in ratatui's own graph, and it brings no backend, so it sits beside
   whatever crossterm the app uses.
-- **Small:** one 285-line source file and a 96-byte `Copy` widget.
+- **Small:** one 284-line source file and a 96-byte `Copy` widget.
 
 Works on Linux, Windows and macOS.
 
