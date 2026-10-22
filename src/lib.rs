@@ -3,13 +3,12 @@
 use std::time::Duration;
 
 use ratatui::{
-    buffer::Buffer,
+    buffer::{Buffer, CellWidth},
     layout::Rect,
     style::{Modifier, Style},
     widgets::Widget,
 };
 use unicode_segmentation::UnicodeSegmentation;
-use unicode_width::UnicodeWidthStr;
 
 pub const WIDTH: u16 = 11;
 pub const GLASS_ROWS: u16 = 6;
@@ -218,7 +217,7 @@ impl<'a> Hourglass<'a> {
 fn fitted(text: &str, room: u16) -> impl Iterator<Item = (&str, u16)> + Clone {
     text.graphemes(true)
         .filter(|glyph| !glyph.contains(char::is_control))
-        .map(|glyph| (glyph, u16::try_from(glyph.width()).unwrap_or(u16::MAX)))
+        .map(|glyph| (glyph, glyph.cell_width()))
         .filter(|(_, width)| *width > 0)
         .scan(0u16, move |used, (glyph, width)| {
             *used = used.checked_add(width).filter(|next| *next <= room)?;

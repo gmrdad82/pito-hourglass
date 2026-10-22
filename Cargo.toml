@@ -14,7 +14,7 @@ name = "pito_hourglass"
 [dependencies]
 ratatui = { version = "0.30", default-features = false }
 unicode-segmentation = "1"
-unicode-width = "0.2"
 
 [dev-dependencies]
 ratatui = { version = "0.30", default-features = false, features = ["crossterm"] }
+unicode-width = "0.2"

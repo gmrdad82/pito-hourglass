@@ -1,8 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
+if [ "$#" -eq 0 ]; then
+  done_line="gate: green"
+elif [ "$#" -eq 1 ] && [ "$1" = "--fast" ]; then
+  done_line="fast gate: green"
+else
+  echo "usage: bin/gate [--fast]" >&2
+  exit 2
+fi
 cd "$(dirname "$0")/.."
 export CARGO_NET_GIT_FETCH_WITH_CLI=true
 cargo fmt --check
 cargo clippy --all-targets -- -D warnings
 cargo nextest run --no-tests=pass
 cargo test --doc
+cargo build --release --locked --lib --examples
+echo "$done_line"

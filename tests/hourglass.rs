@@ -4,8 +4,8 @@ use pito_hourglass::{CYCLE, FRAMES, GLASS_ROWS, Hourglass, WIDTH, band_at, frame
 use ratatui::{
     Terminal,
     backend::TestBackend,
-    buffer::Buffer,
-    layout::Rect,
+    buffer::{Buffer, Cell, CellWidth},
+    layout::{Position, Rect},
     style::{Color, Modifier, Style},
     widgets::Widget,
 };
@@ -79,7 +79,7 @@ fn read(buffer: &Buffer) -> Drawn {
                 continue;
             }
             line.push_str(cell.symbol());
-            hidden = cell.symbol().width().saturating_sub(1);
+            hidden = cell.symbol().cell_width().saturating_sub(1);
         }
         let marked: String = row
             .iter()
@@ -504,4 +504,285 @@ fn the_defaults_are_the_hey_copy_with_no_hint() {
         read(terminal.backend().buffer())
     };
     assert_eq!(by_reference.text, drawn.text);
+}
+
+fn render_into(widget: Hourglass<'_>, bounds: Rect, area: Rect) -> Buffer {
+    let mut buffer = Buffer::empty(bounds);
+    widget.render(area, &mut buffer);
+    buffer
+}
+
+#[test]
+fn control_characters_are_dropped_and_the_rest_centres_as_if_they_were_never_there() {
+    let dirty_label = "\tLoad\x1b[31ming...\x7f\r\n";
+    let dirty_hint = "\x1b[0mesc\tstops\nwaiting\x7f";
+    let clean_label = "Load[31ming...";
+    let clean_hint = "[0mescstopswaiting";
+    for (at, width, height) in [(0, 21, 10), (600, 21, 10), (600, 30, 2), (3300, 14, 3)] {
+        let dirty = whole(
+            styled(ms(at)).label(dirty_label).hint(Some(dirty_hint)),
+            width,
+            height,
+        );
+        let clean = whole(
+            styled(ms(at)).label(clean_label).hint(Some(clean_hint)),
+            width,
+            height,
+        );
+        assert_eq!(dirty.text, clean.text, "at {at} ms in {width}x{height}");
+        assert_eq!(dirty.marks, clean.marks, "at {at} ms in {width}x{height}");
+    }
+    let drawn = whole(
+        styled(ms(0)).label(dirty_label).hint(Some(dirty_hint)),
+        21,
+        10,
+    );
+    assert_eq!(drawn.text[7], "   Load[31ming...");
+    assert_eq!(drawn.text[8], " [0mescstopswaiting");
+    assert_eq!(drawn.marks[8], format!(" {}", "m".repeat(18)));
+}
+
+#[test]
+fn a_label_of_nothing_printable_draws_no_label_row() {
+    for label in [
+        "\u{200b}\u{200d}\u{2060}\u{feff}",
+        "\t\n\r\n\x1b\x7f\0",
+        "\u{301}\u{302}",
+        "",
+    ] {
+        let glass = whole(styled(ms(600)).label(label).hint(Some(HINT)), 21, 10);
+        assert_eq!(glass.text[1], "        ╭───╮", "{label:?}");
+        assert_eq!(glass.text[7], "", "{label:?}");
+        assert_eq!(glass.marks[7], "", "{label:?}");
+        assert_eq!(glass.text[8], "  esc stops waiting", "{label:?}");
+        let narrow = whole(styled(ms(600)).label(label).hint(Some(HINT)), 10, 4);
+        assert_eq!(narrow.text, ["", "", "esc stops", ""], "{label:?}");
+        assert!(
+            whole(styled(ms(600)).label(label), 30, 3).blank(),
+            "{label:?}"
+        );
+        assert!(
+            whole(styled(ms(600)).label(label), 1, 1).blank(),
+            "{label:?}"
+        );
+    }
+}
+
+#[test]
+fn a_wide_hint_is_cut_at_a_whole_glyph_and_stays_muted() {
+    let narrow = whole(styled(ms(600)).label(LABEL).hint(Some("日ab本c")), 4, 2);
+    assert_eq!(narrow.text, ["Load", "日ab"]);
+    assert_eq!(narrow.marks[1], "m mm");
+    let odd = whole(styled(ms(600)).label(LABEL).hint(Some("日本語")), 5, 2);
+    assert_eq!(odd.text[1], "日本");
+    assert_eq!(odd.marks[1], "m m");
+    let glass = whole(
+        styled(ms(0)).label(LABEL).hint(Some("日本語のラベル日本")),
+        11,
+        8,
+    );
+    assert_eq!(glass.text[0], "   ╭───╮");
+    assert_eq!(glass.text[7], "日本語のラ");
+    assert_eq!(glass.marks[7], "m m m m m");
+    let long = whole(hourglass(ms(600)), 12, 2);
+    assert_eq!(long.text[1], "esc stops wa");
+    assert_eq!(long.marks[1], "m".repeat(12));
+}
+
+#[test]
+fn halfwidth_sound_marks_take_the_cell_the_terminal_gives_them() {
+    let label = "ﾊﾞｶ";
+    let fits = whole(styled(ms(0)).label(label), 3, 1);
+    assert_eq!(fits.text, ["ﾊﾞｶ"]);
+    assert_eq!(fits.marks, ["m m"]);
+    assert_eq!(whole(styled(ms(0)).label(label), 2, 1).text, ["ﾊﾞ"]);
+    assert!(whole(styled(ms(0)).label(label), 1, 1).blank());
+    let centred = whole(styled(ms(0)).label(label), 7, 1);
+    assert_eq!(centred.text, ["  ﾊﾞｶ"]);
+    let hint = whole(styled(ms(0)).label(LABEL).hint(Some("ﾊﾟﾊﾟ")), 10, 2);
+    assert_eq!(hint.text[1], "   ﾊﾟﾊﾟ");
+    assert_eq!(hint.marks[1], "   m m");
+}
+
+#[test]
+fn huge_elapsed_times_stay_in_range_and_keep_the_phase() {
+    let huge = [
+        Duration::MAX,
+        Duration::from_secs(u64::MAX),
+        ms(u64::MAX),
+        Duration::from_secs(86_400 * 365 * 1000) + ms(3333),
+    ];
+    for elapsed in huge {
+        assert!(frame_at(elapsed) < FRAMES.len(), "{elapsed:?}");
+        for n in [0, 1, 10, usize::MAX] {
+            if let Some(band) = band_at(elapsed, n) {
+                assert!(band < n, "{elapsed:?} n {n}");
+            }
+        }
+        let phase = ms(u64::try_from(elapsed.as_millis() % 21_000).unwrap());
+        assert_eq!(frame_at(elapsed), frame_at(phase), "{elapsed:?}");
+        assert_eq!(band_at(elapsed, 10), band_at(phase, 10), "{elapsed:?}");
+        for (width, height) in [(21, 10), (10, 2), (5, 1)] {
+            let drawn = whole(hourglass(elapsed), width, height);
+            let same = whole(hourglass(phase), width, height);
+            assert_eq!(drawn.text, same.text, "{elapsed:?}");
+            assert_eq!(drawn.marks, same.marks, "{elapsed:?}");
+        }
+    }
+}
+
+#[test]
+fn the_band_for_no_one_and_very_many_characters() {
+    for at in [0, 200, 600, 1199, 1200, 1499, u64::MAX] {
+        assert_eq!(band_at(ms(at), 0), None, "at {at} ms");
+    }
+    let one: Vec<usize> = (0..1500).filter_map(|at| band_at(ms(at), 1)).collect();
+    assert!(!one.is_empty());
+    assert!(one.iter().all(|band| *band == 0));
+    assert_eq!(band_at(ms(0), usize::MAX), None);
+    assert_eq!(band_at(ms(600), usize::MAX), Some(usize::MAX / 2));
+    assert_eq!(band_at(ms(1200), usize::MAX), None);
+    let sweep: Vec<usize> = (0..1200)
+        .filter_map(|at| band_at(ms(at), usize::MAX))
+        .collect();
+    assert!(sweep.windows(2).all(|pair| pair[0] < pair[1]));
+    assert!(sweep.last().is_some_and(|band| *band < usize::MAX));
+}
+
+#[test]
+fn the_owned_and_the_borrowed_widget_draw_the_same() {
+    let bounds = Rect::new(0, 0, 24, 12);
+    for at in [0, 600, 3300, 4199] {
+        for area in [bounds, Rect::new(3, 2, 21, 10), Rect::new(1, 1, 9, 3)] {
+            let widget = hourglass(ms(at));
+            let owned = render_into(widget, bounds, area);
+            let mut borrowed = Buffer::empty(bounds);
+            (&widget).render(area, &mut borrowed);
+            assert_eq!(owned, borrowed, "at {at} ms in {area:?}");
+        }
+    }
+}
+
+#[test]
+fn two_rows_hold_label_and_hint_and_one_row_the_label_alone() {
+    let two = whole(hourglass(ms(600)), 30, 2);
+    assert_eq!(
+        two.text,
+        ["          Loading...", "      esc stops waiting"]
+    );
+    assert_eq!(
+        two.marks,
+        ["          mmmmaAammm", "      mmmmmmmmmmmmmmmmm"]
+    );
+    let one = whole(hourglass(ms(600)), 30, 1);
+    assert_eq!(one.text, ["          Loading..."]);
+    let three = whole(hourglass(ms(600)), 30, 3);
+    assert_eq!(three.text[..2], two.text[..]);
+    assert_eq!(three.text[2], "");
+}
+
+#[test]
+fn an_area_past_the_buffer_edge_draws_only_what_overlaps() {
+    let edge = draw(hourglass(ms(600)), 21, 10, Rect::new(10, 5, 21, 10));
+    assert_eq!(
+        edge.text,
+        [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "          Loading...",
+            "          esc stops w",
+            "",
+            "",
+        ]
+    );
+    assert_eq!(edge.marks[7], format!("          {}", "m".repeat(11)));
+    let bounds = Rect::new(0, 0, 30, 12);
+    for area in [
+        Rect::new(5, 2, 40, 40),
+        Rect::new(20, 8, 30, 30),
+        Rect::new(0, 6, 30, 30),
+        Rect::new(u16::MAX - 4, 0, 4, 12),
+    ] {
+        let past = render_into(hourglass(ms(3300)), bounds, area);
+        let inside = render_into(hourglass(ms(3300)), bounds, area.intersection(bounds));
+        assert_eq!(past, inside, "{area:?}");
+    }
+    let glass = read(&render_into(
+        hourglass(ms(0)),
+        bounds,
+        Rect::new(5, 2, 40, 40),
+    ));
+    assert_eq!(glass.text[3], format!("{}╭───╮", " ".repeat(15)));
+    assert_eq!(glass.text[9], format!("{}Loading...", " ".repeat(12)));
+}
+
+#[test]
+fn an_area_outside_the_buffer_draws_nothing() {
+    for area in [
+        Rect::new(21, 0, 10, 10),
+        Rect::new(0, 10, 21, 10),
+        Rect::new(40, 30, 21, 10),
+        Rect::new(u16::MAX - 21, u16::MAX - 10, 21, 10),
+        Rect::new(u16::MAX, u16::MAX, 30, 30),
+    ] {
+        assert!(draw(hourglass(ms(600)), 21, 10, area).blank(), "{area:?}");
+    }
+    let bounds = Rect::new(5, 3, 21, 10);
+    for area in [Rect::new(0, 0, 5, 13), Rect::new(0, 0, 26, 3)] {
+        let drawn = render_into(hourglass(ms(600)), bounds, area);
+        assert_eq!(drawn, Buffer::empty(bounds), "{area:?}");
+    }
+}
+
+#[test]
+fn a_buffer_away_from_the_origin_centres_in_its_own_area() {
+    let corner = whole(hourglass(ms(3300)), 21, 10);
+    let bounds = Rect::new(5, 3, 21, 10);
+    for area in [bounds, Rect::new(0, 0, 26, 13), Rect::new(5, 3, 40, 40)] {
+        let away = read(&render_into(hourglass(ms(3300)), bounds, area));
+        assert_eq!(away.text, corner.text, "{area:?}");
+        assert_eq!(away.marks, corner.marks, "{area:?}");
+    }
+}
+
+#[test]
+fn no_render_touches_a_cell_outside_its_area() {
+    let sentinel = Cell::new("·");
+    let bounds = Rect::new(2, 1, 20, 14);
+    let offsets = [(2, 1), (5, 4), (0, 0), (12, 9)];
+    let mut renders = 0;
+    for width in 0..=14u16 {
+        for height in 0..=10u16 {
+            let step = usize::from(width) * 11 + usize::from(height);
+            let (x, y) = offsets[step % offsets.len()];
+            let at = CYCLE * u32::try_from(step % 13).unwrap() / 13;
+            let area = Rect::new(x, y, width, height);
+            for hint in [None, Some(HINT)] {
+                let mut buffer = Buffer::filled(bounds, sentinel.clone());
+                styled(at).label(LABEL).hint(hint).render(area, &mut buffer);
+                let mut touched = 0;
+                for row in bounds.top()..bounds.bottom() {
+                    for column in bounds.left()..bounds.right() {
+                        let cell = &buffer[(column, row)];
+                        if area.contains(Position::new(column, row)) {
+                            touched += usize::from(*cell != sentinel);
+                        } else {
+                            assert_eq!(*cell, sentinel, "{area:?} at {at:?} hint {hint:?}");
+                        }
+                    }
+                }
+                assert_eq!(
+                    touched > 0,
+                    !area.intersection(bounds).is_empty(),
+                    "{area:?} at {at:?} hint {hint:?}"
+                );
+                renders += 1;
+            }
+        }
+    }
+    assert_eq!(renders, 330);
 }
