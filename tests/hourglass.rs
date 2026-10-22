@@ -704,16 +704,6 @@ fn an_area_past_the_buffer_edge_draws_only_what_overlaps() {
     );
     assert_eq!(edge.marks[7], format!("          {}", "m".repeat(11)));
     let bounds = Rect::new(0, 0, 30, 12);
-    for area in [
-        Rect::new(5, 2, 40, 40),
-        Rect::new(20, 8, 30, 30),
-        Rect::new(0, 6, 30, 30),
-        Rect::new(u16::MAX - 4, 0, 4, 12),
-    ] {
-        let past = render_into(hourglass(ms(3300)), bounds, area);
-        let inside = render_into(hourglass(ms(3300)), bounds, area.intersection(bounds));
-        assert_eq!(past, inside, "{area:?}");
-    }
     let glass = read(&render_into(
         hourglass(ms(0)),
         bounds,
@@ -749,6 +739,33 @@ fn a_buffer_away_from_the_origin_centres_in_its_own_area() {
         let away = read(&render_into(hourglass(ms(3300)), bounds, area));
         assert_eq!(away.text, corner.text, "{area:?}");
         assert_eq!(away.marks, corner.marks, "{area:?}");
+    }
+}
+
+#[test]
+fn a_buffer_at_the_u16_limit_draws_like_one_at_the_origin() {
+    let bounds = Rect::new(u16::MAX - 21, u16::MAX - 10, 21, 10);
+    assert_eq!((bounds.right(), bounds.bottom()), (u16::MAX, u16::MAX));
+    for at in [0, 600, 3300] {
+        for widget in [hourglass(ms(at)), styled(ms(at)).label(LABEL)] {
+            let corner = whole(widget, 21, 10);
+            let limit = read(&render_into(widget, bounds, bounds));
+            assert_eq!(limit.text, corner.text, "at {at} ms");
+            assert_eq!(limit.marks, corner.marks, "at {at} ms");
+        }
+        for (width, height) in [(21, 7), (21, 8), (11, 7), (10, 2), (10, 1), (21, 1)] {
+            let area = Rect::new(u16::MAX - width, u16::MAX - height, width, height);
+            let limit = read(&render_into(hourglass(ms(at)), bounds, area));
+            let mut origin = Buffer::empty(Rect::new(0, 0, 21, 10));
+            hourglass(ms(at)).render(
+                Rect::new(21 - width, 10 - height, width, height),
+                &mut origin,
+            );
+            let origin = read(&origin);
+            assert_eq!(limit.text, origin.text, "at {at} ms in {width}x{height}");
+            assert_eq!(limit.marks, origin.marks, "at {at} ms in {width}x{height}");
+            assert!(!limit.blank(), "at {at} ms in {width}x{height}");
+        }
     }
 }
 
